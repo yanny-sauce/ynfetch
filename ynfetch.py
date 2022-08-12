@@ -1,10 +1,23 @@
 import platform
 from uptime import uptime
+try:
+    from uptime import uptime
+except ImportError:
+    print("Module uptime missing, would you like to install it? Y/N")
+    ans=input()
+    if input=="Y":
+        os.system("pip install uptime")
+try:
+    import psutil
+except ImportError:
+    print("Module psutil missing, would you like to install it? Y/N")
+    ans=input()
+    if input=="Y":
+        os.system("pip install psutil")
 import math
 import getpass
 import subprocess as sp
 import os
-import psutil
 
 blsp = "              "
 aski = []
