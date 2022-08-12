@@ -2,14 +2,14 @@ import platform
 from uptime import uptime
 try:
     from uptime import uptime
-except ImportError:
+except ModuleNotFoundError:
     print("Module uptime missing, would you like to install it? Y/N")
     ans=input()
     if input=="Y":
         os.system("pip install uptime")
 try:
     import psutil
-except ImportError:
+except ModuleNotFoundError:
     print("Module psutil missing, would you like to install it? Y/N")
     ans=input()
     if input=="Y":
