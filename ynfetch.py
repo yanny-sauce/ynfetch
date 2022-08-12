@@ -1,23 +1,24 @@
 import platform
-from uptime import uptime
+import math
+import getpass
+import subprocess as sp
+import os
 try:
     from uptime import uptime
 except ModuleNotFoundError:
     print("Module uptime missing, would you like to install it? Y/N")
     ans=input()
-    if input=="Y":
+    if ans=="Y":
         os.system("pip install uptime")
+        exit()
 try:
     import psutil
 except ModuleNotFoundError:
     print("Module psutil missing, would you like to install it? Y/N")
     ans=input()
-    if input=="Y":
+    if ans=="Y":
         os.system("pip install psutil")
-import math
-import getpass
-import subprocess as sp
-import os
+        exit()
 
 blsp = "              "
 aski = []
@@ -40,12 +41,17 @@ pkgs = "" #METHOD DEPENDS ON THE PLATFORM AND DISTRIBUTION
 finl = []
 
 if "Linux" in krnl:
+    osys = sp.getoutput("cat /etc/os-release")
+    for i in osys.split("\n"):
+        if i.split('=')[0]=="NAME":
+            osys=i.split('=')[1].split('"')[1]
+
     modl = sp.getoutput("cat /sys/devices/virtual/dmi/id/product_version")
     krnl = krnl.split("-")[0]+"-"+krnl.split("-")[1]+"-"+krnl.split("-")[2]
     memd = dict((i.split()[0].rstrip(':'),int(i.split()[1])) for i in open('/proc/meminfo').readlines())
     memr = str(math.floor((int(memd['MemTotal'])-int(memd['MemFree'])-int(memd['Cached'])-int(memd['SReclaimable'])+int(memd['Shmem']))/1024)) + "M / " + str(math.floor(int(memd['MemTotal'])/1024))+"M"
 
-    if "arch" in krnl:
+    if osys=="Arch Linux":
         aski.append("      /\      ")
         aski.append("     /  \     ")
         aski.append("    /\   \    ")
@@ -53,13 +59,58 @@ if "Linux" in krnl:
         aski.append("  /   ,,   \  ")
         aski.append(" /   |  |  -\ ")
         aski.append("/_-''    ''-_\\")
-
-        for cnt in range(0,7):
-            aski[cnt]="\033[95m"+aski[cnt]+"\u001b[0m"
-
-        osys = "Arch Linux"
         pkgs = sp.getoutput("pacman -Qq | wc -l")
-        pkgs = str(pkgs) + " (pacman)"
+        pkgs = pkgs + " (pacman)"
+    elif osys=="Artix Linux":
+        aski.append("        /\      ")
+        aski.append("       /  \     ")
+        aski.append("      /`'.,\    ")
+        aski.append("     /     ',   ")
+        aski.append("    /      ,`\  ")
+        aski.append("   /   ,.'`.  \ ")
+        aski.append("  /.,'`     `'.\\")
+        pkgs = sp.getoutput("pacman -Qq | wc -l")
+        pkgs = pkgs + " (pacman)"
+    elif osys=="Ubuntu":
+        aski.append("         _   ")
+        aski.append("     ---(_)  ")
+        aski.append(" _/  ---  \  ")
+        aski.append("(_) |   |    ")
+        aski.append("  \  --- _/  ")
+        aski.append("     ---(_)  ")
+        aski.append("             ")
+        pkgs = sp.getoutput("dpkg -l | wc -l")
+        pkgs = pkgs + " (dpkg)"
+    elif osys=="Linux Mint":
+        aski.append(" ___________  ")
+        aski.append("|_          \ ")
+        aski.append("  | | _____ | ")
+        aski.append("  | | | | | | ")
+        aski.append("  | | | | | | ")
+        aski.append("  | \_____/ | ")
+        aski.append("  \_________/ ")
+        pkgs = sp.getoutput("dpkg -l | wc -l")
+        pkgs = pkgs + " (dpkg)"
+    elif osys=="Fedora Linux":
+        aski.append("       ^^~^~^:")
+        aski.append("      ^^~. :~!")
+        aski.append("    . ^:~   ::")
+        aski.append(".:^^^~^.^^~.  ")
+        aski.append("~^:.  ^:~     ")
+        aski.append("~^:  .~^^     ")
+        aski.append(".^~~^~^^      ")
+        pkgs = sp.getoutput("dnf list installed | wc -l")
+        pkgs = pkgs + " (dnf)"
+    elif osys=="Manjaro Linux":
+        aski.append("||||||||| ||||")
+        aski.append("||||||||| ||||")
+        aski.append("||||      ||||")
+        aski.append("|||| |||| ||||")
+        aski.append("|||| |||| ||||")
+        aski.append("|||| |||| ||||")
+        aski.append("|||| |||| ||||")
+        pkgs = sp.getoutput("pacman -Qq | wc -l")
+        pkgs = pkgs + " (pacman)"
     else:
         aski.append("      ___     ")
         aski.append("     (.. \    ")
@@ -68,7 +119,6 @@ if "Linux" in krnl:
         aski.append("   ( |  | /|  ")
         aski.append("  _/\ __)/_)  ")
         aski.append("  \/-____\/   ")
-        osys = "Linux (Unknown)"
         pkgs = "N/A"
 elif "Windows" in krnl:
     memd=psutil.virtual_memory()
@@ -85,6 +135,8 @@ elif "Windows" in krnl:
         pkgs = sp.getoutput('winget list | find /c /v ""') + " (winget)"
         modl = platform.uname().machine
         
+for cnt in range(0,7):
+    aski[cnt]="\033[95m"+aski[cnt]+"\u001b[0m"
 
 finl.append(aski[0]+"   "+'\u001b[38;5;245m'+user+'\u001b[0m')
 finl.append(aski[1]+"   OS:       "+osys)
